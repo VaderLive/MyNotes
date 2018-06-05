@@ -1,0 +1,54 @@
+(1)Tools->Options->Directories->Include files中添加C:\Program Files\MySQL\MySQL Server 6.0\include
+(2)Tools->Options->Directories->Library files中添加C:\Program Files\MySQL\MySQL Server 6.0\lib\opt
+
+
+一、数据库的连接
+1.mysql_library_init(0,NULL,NULL);//初始化数据库，返回真为成功
+2.mysql_init(&mydata);//初始化数据结构
+3.mysql_options(&mydata,MYSQL_SET_CHARSET_NAME,"UTF8");//设置编码方式，例如GBK设置中文，返回0为成功
+4.mysql_real_connect(&mydata,"localhost","root","1234","hotel",3306,"NULL",0);//数据库的连接，返回非NULL为成功
+
+二、查询
+stirng sqlstr;
+sqlstr="select * from tablename（表名） where （字段名）=\'"+string（字符串）+"\'";
+mysql_query(&mydata（数据库的对象）,sqlstr.c_str()（这里需要一个）);
+
+三、添加一行数据：
+A. sprintf(sqlstr, "INSERT INTO room VALUES('%s','%s','%s',%d,'%s')", num,type,capacity,price,state);
+B. sqlstr ="INSERT INTO room VALUES(\'"+num+"\',\'"+type+"\',\'"+capacity+"\',\'"+price+"\',\'"+state+"\');";
+
+四、获得表中特定行的某个数据：
+sqlstr="select * from info（表名） where customername（字段名）=\'"+name（字符串）+"\'; ";
+mysql_query(&mydata,sqlstr.c_str());
+result=mysql_store_result(&mydata);（MYSQL_RES *result=NULL;）
+row=mysql_fetch_row(result);（MYSQL_ROW row=NULL;）
+intime=row[2];[把表中获得的数据row【2】（表中第三个数据）复制给intime]
+
+五、表头和各行的输出：
+MYSQL_RES *result = NULL;
+result = mysql_store_result(&mydata);
+int rowcount=mysql_num_rows(result);//统计行数
+cout<<"row count: "<<rowcount<<endl;
+
+unsigned int fieldcount = mysql_num_fields(result);//统计字段数
+MYSQL_FIELD *field=NULL;
+for(unsigned int i=0;i<fieldcount;i++)
+{
+	field=mysql_fetch_field_direct(result,i);
+	cout<<field->name<<"\t\t";//输出字段内容
+}
+cout<<endl;
+
+各行的输出：
+MYSQL_ROW row=NULL;
+row=mysql_fetch_row(result);
+while(NULL!=row)
+{
+	for(i=0; i<fieldcount;i++)
+	{
+		cout<<row[i]<<"\t\t";//输出各行内容（打印一行不再使用循环，只按数组输出特定行）
+	}
+	
+	cout<<endl;
+	row=mysql_fetch_row(result);
+}
